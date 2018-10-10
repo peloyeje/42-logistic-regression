@@ -76,47 +76,33 @@ class LogisticRegression:
 
         """
 
-        # Scale dataset
-        data = self._scale(np.c_[X, y])
-        X, y = data[:, :-1], data[:, -1]
         # Add intercept column
         X = self._intercept(X)
         # Initialize weight vector
         self.beta = np.ones(X.shape[1])
-        self.history = np.zeros((self.max_iterations, 4))
+        self.history = np.zeros((self.max_iterations, 3))
 
         # Iterate until we reach convergence or maximum number of iterations
         for i in range(self.max_iterations):
-            # Compute gradient
-            error = self._model(X, self.beta) - y
-            gradient = (2.0/X.shape[0]) * np.dot(X.T, error)
-
-            # Update beta according to learning rate
-            beta = self.beta - (self.lr * gradient)
-            loss = self._loss(
-                self._model(X, beta),
-                y
-            )
+            # We save n-1 beta for convergence test
+            beta = self.beta
+            # Compute gradient and update weights according to learning rate
+            self.beta = self.beta + (self.lr * self._gradient(X, self.beta, y))
+            self.log_likelihood = self._log_likelihood(X, self.beta, y)
+            self.accuracy = self._accuracy_score(self._model(X, self.beta) > .5, y)
 
             # Store history
-            self.history[i, :] = (i, *self._descale_beta(self.beta), loss)
+            self.history[i, :] = (i, self.log_likelihood, self.accuracy)
 
             if np.sum(np.abs(beta - self.beta)) < self.threshold:
                 # We reached sufficient precision, let's exit the loop
                 print(f'Convergence reached in {i} iterations, exiting the loop ...')
                 break
-            else:
-                # We store the new weights
-                self.beta = beta
-                self.loss = loss
 
             # Print info on the current iteration if needed
             if verbose and i % 10 == 0:
                 print(
-                    f'[{i:5}] Loss: {self.loss:20} | Beta: {self._descale_beta(self.beta)}')
-
-        # When convergence is reached, denormalize the beta vector and store it
-        self.beta = self._descale_beta(self.beta)
+                    f'[{i:5}] Accuracy: {self.accuracy:10.3%} | LL: {self.log_likelihood:.4f}')
 
         return self.beta, self.history
 
