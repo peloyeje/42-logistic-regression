@@ -50,7 +50,8 @@ class LogisticRegression:
                 'Prediction and ground truth vectors must have the same dimension')
         return (y_pred == y_true).sum() / y_pred.size
 
-    def _intercept(self, X):
+    @staticmethod
+    def _intercept(X):
         """Add intercept (column of ones) to the design matrix X"""
         return np.c_[np.ones(X.shape[0]), X]
 
