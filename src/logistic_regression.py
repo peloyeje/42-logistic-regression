@@ -1,5 +1,6 @@
 import numpy as np
 from matplotlib import pyplot as plt
+from .utils import OneHotEncoder
 
 class LogisticRegression:
     SUPPORTED_ALGORITHMS = ('gd', 'sgd')
@@ -39,6 +40,9 @@ class LogisticRegression:
         self.max_iterations = int(max_iterations)
         self.threshold = float(threshold)
 
+        self._models = []
+        self._histories = []
+
     @staticmethod
     def _sigmoid(x):
         """Link function between Xb and y"""
@@ -73,8 +77,32 @@ class LogisticRegression:
         """Add intercept (column of ones) to the design matrix X"""
         return np.c_[np.ones(X.shape[0]), X]
 
-    def fit(self, X, y, verbose=True):
-        """Learns the weights of the regression model
+    @property
+    def is_multiclass(self):
+        return len(self._models) > 0
+
+    def fit(self, X, y, **kwargs):
+        """
+        """
+        if len(np.unique(y)) > 2:
+            # There are more than 2 classes in the target column
+            if self.multiclass == 'ovr':
+                # One Hot Encode the target column
+                self._encoder = OneHotEncoder()
+                y = self._encoder.fit_transform(y)
+                # Train one model per class
+                for name, data in zip(self._encoder.categories, y.T):
+                    print(f'Training model for class "{name}"')
+                    lr = LogisticRegression()
+                    lr._fit(X, data, verbose=False, **kwargs)
+                    self._models.append(lr)
+        else:
+            # We directly call the underlying method
+            self._fit(X, y, **kwargs)
+
+
+    def _fit(self, X, y, verbose=True):
+        """Trains a logistic regression model
 
         Parameters
         ----------
@@ -125,9 +153,23 @@ class LogisticRegression:
 
         return self.beta, self.history
 
+    def predict_proba(self, X):
+        """Predicts target probability according to input data"""
+        if self.is_multiclass:
+            return np.array([m.predict_proba(X) for m in self._models]).T
+        else:
+            X = self._intercept(X)
+            return self._model(X, self.beta)
+
+    def predict(self, X, threshold=0.5):
+        """Returns class predictions"""
+        if self.is_multiclass:
+            return self.predict_proba(X).argmax(axis=1)
+        else:
+            return self.predict_proba(X) >= threshold
+
     def plot_history(self):
         """Plots a summary graph of the fitting process."""
-
         if not hasattr(self, 'history'):
             raise ValueError('Please train the model first')
 
@@ -138,28 +180,5 @@ class LogisticRegression:
             ax.plot(np.arange(data.size), data)
             ax.legend([label])
             ax.set_xlabel('Iterations')
-        fig.suptitle(f'Weights: {self.beta} | Loss: {self.loss}')
-        plt.show()
-
-    def plot_result(self, X):
-        """Plots the regression line alongside data points"""
-
-        if not hasattr(self, 'history'):
-            raise ValueError('Please train the model first')
-
-        fig, ax = plt.subplots(figsize=(10, 5))
-        projection = np.linspace(X[:, 0].min(), X[:, 0].max(), 100)
-        ax.scatter(X[:, 0], X[:, 1], label='Data', color='b')
-        ax.plot(projection, self.predict(projection), label='Regression', color='r')
-
         fig.suptitle(f'Actual data vs. projected data')
         plt.show()
-
-    def predict_proba(self, X):
-        """Predicts target probability according to input data"""
-        X = self._intercept(X)
-        return self._model(X, self.beta)
-
-    def predict(self, X, threshold=0.5):
-        """Returns binary outcome"""
-        return self.predict_proba(X) >= threshold
