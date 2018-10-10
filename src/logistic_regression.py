@@ -136,7 +136,11 @@ class LogisticRegression:
         fig.suptitle(f'Actual data vs. projected data')
         plt.show()
 
-    def predict(self, X):
-        """Predicts target according to input data"""
+    def predict_proba(self, X):
+        """Predicts target probability according to input data"""
         X = self._intercept(X)
         return self._model(X, self.beta)
+
+    def predict(self, X, threshold=0.5):
+        """Returns binary outcome"""
+        return self.predict_proba(X) >= threshold
