@@ -94,9 +94,12 @@ class LogisticRegression:
                 # Train one model per class
                 for name, data in zip(self._encoder.categories, y.T):
                     print(f'Training model for class "{name}"')
-                    lr = LogisticRegression()
-                    lr._fit(X, data, verbose=False, **kwargs)
-                    self._models.append(lr)
+
+                    model = LogisticRegression()
+                    _, history = model._fit(X, data, verbose=False, **kwargs)
+                    # Store trained models and histories in parent class
+                    self._models.append(model)
+                    self._histories.append(history)
         else:
             # We directly call the underlying method
             self._fit(X, y, **kwargs)
