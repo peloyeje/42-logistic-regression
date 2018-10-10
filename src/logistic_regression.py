@@ -20,36 +20,39 @@ class LogisticRegression:
         self.lr = float(lr)
         self.max_iterations = int(max_iterations)
         self.threshold = float(threshold)
-    
-    @staticmethod
-    def _model(X, b):
-        """Basic linear regression model"""
-        return np.dot(X, b)
 
     @staticmethod
-    def _loss(y_true, y_pred):
-        """Computes the MSE"""
-        if len(y_true) != len(y_pred):
+    def _sigmoid(x):
+        """Link function between Xb and y"""
+        return 1 / (1 + np.exp(-x))
+
+    @classmethod
+    def _model(cls, X, b):
+        """Logistic regression model"""
+        return cls._sigmoid(np.dot(X, b))
+
+    @classmethod
+    def _gradient(cls, X, b, y):
+        """Gradient of the log likelihood formula"""
+        return np.dot(X.T, (y - cls._model(X, b)))
+
+    @classmethod
+    def _log_likelihood(cls, X, b, y):
+        """Log likelihood of the parameters"""
+        return np.mean(
+            y * np.log(cls._model(X, b)) + (1 - y) * np.log(1 - cls._model(X, b))
+        )
+
+    @staticmethod
+    def _accuracy_score(y_pred, y_true):
+        if len(y_pred) != len(y_true):
             raise ValueError(
-                'Length mismatch between ground truth and prediction vector')
-        return np.mean((y_true - y_pred) ** 2)
-
-    def _scale(self, X):
-        """Normalize data"""
-        self.mean = X.mean(axis=0)
-        self.std = X.std(axis=0)
-        return (X - self.mean) / self.std
+                'Prediction and ground truth vectors must have the same dimension')
+        return (y_pred == y_true).sum() / y_pred.size
 
     def _intercept(self, X):
         """Add intercept (column of ones) to the design matrix X"""
         return np.c_[np.ones(X.shape[0]), X]
-
-    def _descale_beta(self, b):
-        """Denormalize weights"""
-        b = b.copy()
-        b[0] = (b[0] * self.std[1] - b[1] * self.mean[0] * (self.std[1] / self.std[0])) + self.mean[1]
-        b[1] = b[1] * (self.std[1] / self.std[0])
-        return b
 
     def fit(self, X, y, verbose=True):
         """Learns the weights of the regression model
