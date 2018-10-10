@@ -102,7 +102,7 @@ class LogisticRegression:
             # Print info on the current iteration if needed
             if verbose and i % 10 == 0:
                 print(
-                    f'[{i:5}] Accuracy: {self.accuracy:10.3%} | LL: {self.log_likelihood:.4f}')
+                    f'[{i:5}] Train accuracy: {self.accuracy:10.3%} | LL: {self.log_likelihood:.4f}')
 
         return self.beta, self.history
 
