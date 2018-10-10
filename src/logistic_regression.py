@@ -2,11 +2,19 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 class LogisticRegression:
-    def __init__(self, lr=0.01, max_iterations=1000, threshold=1e-4):
+    SUPPORTED_ALGORITHMS = ('gd', 'sgd')
+
+    def __init__(
+        self, algorithm='gd', multiclass='ovr', lr=0.01,
+        max_iterations=1000, threshold=1e-3):
         """Initialize logistic regression model
 
         Parameters
         ----------
+        algorithm: str
+            Training algorithm ('gd' or 'sgd')
+        multiclass: str
+            The way to handle multiclass targets ('ovr' or None)
         lr: float
             Learning rate
         max_iterations: int
@@ -15,7 +23,17 @@ class LogisticRegression:
             If the difference between the sum of the parameters at iteration
             t+1 and at iteration t is lower than this value, we assume
             convergence has been reached
+
         """
+        if algorithm not in self.SUPPORTED_ALGORITHMS:
+            raise ValueError(f'Algorithm "{algorithm}" not supported')
+        else:
+            self.algorithm = algorithm
+
+        if multiclass not in ('ovr', None):
+            raise ValueError(f'Multiclass method "{algorithm}" not supported')
+        else:
+            self.multiclass = multiclass
 
         self.lr = float(lr)
         self.max_iterations = int(max_iterations)
@@ -75,9 +93,9 @@ class LogisticRegression:
             Each row contains : the beta parameters and the loss
 
         """
-
         # Add intercept column
         X = self._intercept(X)
+
         # Initialize weight vector
         self.beta = np.ones(X.shape[1])
         self.history = np.zeros((self.max_iterations, 3))
@@ -86,6 +104,7 @@ class LogisticRegression:
         for i in range(self.max_iterations):
             # We save n-1 beta for convergence test
             beta = self.beta
+
             # Compute gradient and update weights according to learning rate
             self.beta = self.beta + (self.lr * self._gradient(X, self.beta, y))
             self.log_likelihood = self._log_likelihood(X, self.beta, y)
@@ -94,8 +113,8 @@ class LogisticRegression:
             # Store history
             self.history[i, :] = (i, self.log_likelihood, self.accuracy)
 
+            # If we reached sufficient precision, let's exit the loop
             if np.sum(np.abs(beta - self.beta)) < self.threshold:
-                # We reached sufficient precision, let's exit the loop
                 print(f'Convergence reached in {i} iterations, exiting the loop ...')
                 break
 
