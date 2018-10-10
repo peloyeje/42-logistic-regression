@@ -165,12 +165,30 @@ class LogisticRegression:
             X = self._intercept(X)
             return self._model(X, self.beta)
 
-    def predict(self, X, threshold=0.5):
-        """Returns class predictions"""
+    def predict(self, X, threshold=0.5, names=True):
+        """Returns class predictions.
+
+        Parameters
+        ----------
+        X: np.array
+            Features matrix
+        threshold: float ([0, 1])
+            Decision frontier
+        names: bool
+            Returns the classes names rather than indices ?
+
+        Returns
+        -------
+        np.array
+
+        """
         if self.is_multiclass:
-            return self.predict_proba(X).argmax(axis=1)
+            res = self.predict_proba(X).argmax(axis=1)
         else:
-            return self.predict_proba(X) >= threshold
+            res = self.predict_proba(X) >= threshold
+
+        return (np.array([self._encoder.categories[i] for i in res])
+                    if names else res)
 
     def plot_history(self):
         """Plots a summary graph of the fitting process."""
