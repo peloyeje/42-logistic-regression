@@ -75,7 +75,7 @@ class LogisticRegression:
 
     @staticmethod
     def _intercept(X):
-        """Add intercept (column of ones) to the design matrix X"""
+        """Add intercept (column of ones) to the features matrix X"""
         return np.c_[np.ones(X.shape[0]), X]
 
     @property
