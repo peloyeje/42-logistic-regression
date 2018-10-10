@@ -173,12 +173,12 @@ class LogisticRegression:
         if not hasattr(self, 'history'):
             raise ValueError('Please train the model first')
 
-        fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(20, 10))
-        labels = ['Intercept', 'Slope', 'Loss']
+        labels = ['Train accurary', 'LL']
+        fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(20, 10))
 
         for ax, data, label in zip(axes, self.history[self.history[:, 0] != 0, 1:].T, labels):
             ax.plot(np.arange(data.size), data)
             ax.legend([label])
             ax.set_xlabel('Iterations')
-        fig.suptitle(f'Actual data vs. projected data')
+        fig.suptitle(f'Logistic regression on {len(self.beta) - 1} features')
         plt.show()
