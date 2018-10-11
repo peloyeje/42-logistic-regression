@@ -1,7 +1,8 @@
+#!/usr/bin/env python
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-#%matplotlib inline
 
 class PairPlot(object):
     def __init__(self, path):
