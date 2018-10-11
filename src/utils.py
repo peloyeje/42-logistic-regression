@@ -1,9 +1,11 @@
+import csv
+import pathlib
+
 import numpy as np
 
 class OneHotEncoder:
     def __init__(self):
         self.categories = []
-        pass
 
     def fit(self, X):
         """"""
