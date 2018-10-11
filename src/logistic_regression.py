@@ -9,7 +9,7 @@ class LogisticRegression:
 
     def __init__(
         self, algorithm='gd', multiclass='ovr', lr=0.01,
-        max_iterations=1000, threshold=1e-3):
+        epochs=1000, threshold=1e-3):
         """Initialize logistic regression model
 
         Parameters
@@ -20,8 +20,8 @@ class LogisticRegression:
             The way to handle multiclass targets ('ovr' or None)
         lr: float
             Learning rate
-        max_iterations: int
-            Maximum number of GD iterations
+        epochs: int
+            Maximum number of training iterations
         threshold: float
             If the difference between the sum of the parameters at iteration
             t+1 and at iteration t is lower than this value, we assume
@@ -37,7 +37,7 @@ class LogisticRegression:
         self._config = {
             'algorithm': algorithm,
             'multiclass': multiclass,
-            'max_iterations': int(max_iterations),
+            'epochs': int(epochs),
             'threshold': float(threshold),
             'lr': float(lr)
         }
@@ -47,18 +47,21 @@ class LogisticRegression:
 
     @staticmethod
     def _sigmoid(x):
-        """Link function between Xb and y"""
+        """Link function mapping the features space into the target space"""
         return 1 / (1 + np.exp(-x))
+
 
     @classmethod
     def _model(cls, X, b):
         """Logistic regression model"""
         return cls._sigmoid(np.dot(X, b))
 
+
     @classmethod
     def _gradient(cls, X, b, y):
-        """Gradient of the log likelihood formula"""
+        """Gradient of the log likelihood of the parameters"""
         return np.dot(X.T, (y - cls._model(X, b)))
+
 
     @classmethod
     def _log_likelihood(cls, X, b, y):
@@ -67,6 +70,7 @@ class LogisticRegression:
             y * np.log(cls._model(X, b)) + (1 - y) * np.log(1 - cls._model(X, b))
         )
 
+
     @staticmethod
     def _accuracy_score(y_pred, y_true):
         if len(y_pred) != len(y_true):
@@ -74,17 +78,36 @@ class LogisticRegression:
                 'Prediction and ground truth vectors must have the same dimension')
         return (y_pred == y_true).sum() / y_pred.size
 
+
     @staticmethod
     def _intercept(X):
         """Add intercept (column of ones) to the features matrix X"""
         return np.c_[np.ones(X.shape[0]), X]
 
+
     @property
     def is_multiclass(self):
         return len(self._models) > 0
 
+
     def fit(self, X, y, **kwargs):
-        """
+        """Main fit method.
+
+        This method handles multiclass target vectors by evaluating their cardi-
+        nality.
+
+        Parameters
+        ----------
+        X: np.array
+            Training data
+        y: np.array
+            Target
+        kwargs:
+            Keyword parameters of the _fit method
+
+        Returns
+        -------
+        Nothing
         """
         if len(np.unique(y)) > 2:
             # There are more than 2 classes in the target column
@@ -102,28 +125,24 @@ class LogisticRegression:
                     self._models.append(model)
                     self._histories.append(history)
         else:
-            # We directly call the underlying method
             self._fit(X, y, **kwargs)
 
 
-    def _fit(self, X, y, verbose=True):
-        """Trains a logistic regression model
+    def _fit(self, X, y, verbose=False):
+        """Trains a logistic regression model.
 
         Parameters
         ----------
         X: np.array
             Training data
         y: np.array
-            Target
+            Target (shape (x, 1))
+        verbose: bool
+            Should we print metrics during training ?
 
         Returns
         -------
-        beta: np.array
-            Vector of model weights
-
-        history: np.array
-            Performance history of the convergence process
-            Each row contains : the beta parameters and the loss
+        Nothing
 
         """
         # Add intercept column
@@ -131,10 +150,10 @@ class LogisticRegression:
 
         # Initialize weight vector
         self.beta = np.ones(X.shape[1])
-        self.history = np.zeros((self._config['max_iterations'], 3))
+        self.history = np.zeros((self._config['epochs'], 3))
 
         # Iterate until we reach convergence or maximum number of iterations
-        for i in range(self._config['max_iterations']):
+        for i in range(self._config['epochs']):
             # We save n-1 beta for convergence test
             beta = self.beta
 
@@ -176,6 +195,7 @@ class LogisticRegression:
             X = self._intercept(X)
             return self._model(X, self.beta)
 
+
     def predict(self, X, threshold=0.5, names=True):
         """Returns class predictions.
 
@@ -200,6 +220,7 @@ class LogisticRegression:
 
         return (np.array([self._encoder.categories[i] for i in res])
                     if names else res)
+
 
     def plot(self):
         """Plots a summary graph of the fitting process."""
