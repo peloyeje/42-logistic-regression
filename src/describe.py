@@ -91,7 +91,6 @@ class DataAnalysis(object):
 
         print(pd.DataFrame(data_description, index = ["Count","Mean","Std","Min","25%","50%","75%", "Max"], columns = self.header))
 
-path = sys.argv[1]
-
 if __name__ == "__main__":
+    path = sys.argv[1]
     DataAnalysis(path).describe_42()
