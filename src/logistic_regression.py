@@ -43,7 +43,7 @@ class LogisticRegression:
         }
 
         self._models = []
-        self._histories = []
+        self._encoder = OneHotEncoder()
 
     @staticmethod
     def _sigmoid(x):
@@ -112,15 +112,15 @@ class LogisticRegression:
         if len(np.unique(y)) > 2:
             # There are more than 2 classes in the target column
             if self._config['multiclass'] == 'ovr':
-                # One Hot Encode the target column
-                self._encoder = OneHotEncoder()
+                # Encode the target column
                 y = self._encoder.fit_transform(y)
                 # Train one model per class
                 for name, data in zip(self._encoder.categories, y.T):
                     print(f'Training model for class "{name}"')
 
                     model = LogisticRegression()
-                    _, history = model._fit(X, data, verbose=False, **kwargs)
+                    model._fit(X, data, **kwargs)
+
                     # Store trained models and histories in parent class
                     self._models.append(model)
                     self._histories.append(history)
@@ -185,7 +185,6 @@ class LogisticRegression:
                 print(
                     f'[{i:5}] Train accuracy: {self.accuracy:10.3%} | LL: {self.log_likelihood:.4f}')
 
-        return self.beta, self.history
 
     def predict_proba(self, X):
         """Predicts target probability according to input data"""
