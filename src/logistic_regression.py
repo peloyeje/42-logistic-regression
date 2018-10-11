@@ -109,6 +109,9 @@ class LogisticRegression:
         -------
         Nothing
         """
+        # Reset object
+        self._models = []
+
         if len(np.unique(y)) > 2:
             # There are more than 2 classes in the target column
             if self._config['multiclass'] == 'ovr':
@@ -121,9 +124,8 @@ class LogisticRegression:
                     model = LogisticRegression()
                     model._fit(X, data, **kwargs)
 
-                    # Store trained models and histories in parent class
+                    # Store trained model
                     self._models.append(model)
-                    self._histories.append(history)
         else:
             self._fit(X, y, **kwargs)
 
