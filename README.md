@@ -13,7 +13,13 @@ Make sure your Python version is **3.7**
 - `src/describe.py`:
 - `src/histogram.py`:
 - `src/pair_plot.py`:
-- `src/scatter_plot.py`:
+- `src/scatter_plot.py` : this script finds the two courses that have the closest distribution in each of the four Hogwarts houses and plots the corresponding distributions.
+
+To run the script on the Hogwarts training dataset:
+
+```
+.src/scatter_plot.py data/dataset_train.csv
+```
 
 #### Classification
 - `src/logistic_regression.py`: this file contains the logistic regression class definition. The API is based on Scikit-learn base classifier API.
