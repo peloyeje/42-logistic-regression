@@ -8,7 +8,7 @@ import numpy as np
 
 class PairPlot(object):
     def __init__(self, path):
-        self.data = pd.read_csv('../data/dataset_train.csv')
+        self.data = pd.read_csv(path)
         if "Index" in self.data.columns :
             self.data.drop("Index", axis=1, inplace=True)
 
