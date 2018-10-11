@@ -110,4 +110,7 @@ venv.bak/
 .dmypy.json
 dmypy.json
 
+# Project specific
 .ipynb_checkpoints
+output/*
+!output/.gitkeep
