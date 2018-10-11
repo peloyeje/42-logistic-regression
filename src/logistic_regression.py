@@ -30,17 +30,17 @@ class LogisticRegression:
         """
         if algorithm not in self.SUPPORTED_ALGORITHMS:
             raise ValueError(f'Algorithm "{algorithm}" not supported')
-        else:
-            self.algorithm = algorithm
 
         if multiclass not in self.SUPPORTED_MULTICLASS:
             raise ValueError(f'Multiclass method "{multiclass}" not supported')
-        else:
-            self.multiclass = multiclass
 
-        self.lr = float(lr)
-        self.max_iterations = int(max_iterations)
-        self.threshold = float(threshold)
+        self._config = {
+            'algorithm': algorithm,
+            'multiclass': multiclass,
+            'max_iterations': int(max_iterations),
+            'threshold': float(threshold),
+            'lr': float(lr)
+        }
 
         self._models = []
         self._histories = []
@@ -88,7 +88,7 @@ class LogisticRegression:
         """
         if len(np.unique(y)) > 2:
             # There are more than 2 classes in the target column
-            if self.multiclass == 'ovr':
+            if self._config['multiclass'] == 'ovr':
                 # One Hot Encode the target column
                 self._encoder = OneHotEncoder()
                 y = self._encoder.fit_transform(y)
@@ -131,23 +131,25 @@ class LogisticRegression:
 
         # Initialize weight vector
         self.beta = np.ones(X.shape[1])
-        self.history = np.zeros((self.max_iterations, 3))
+        self.history = np.zeros((self._config['max_iterations'], 3))
 
         # Iterate until we reach convergence or maximum number of iterations
-        for i in range(self.max_iterations):
+        for i in range(self._config['max_iterations']):
             # We save n-1 beta for convergence test
             beta = self.beta
 
-            if self.algorithm == 'gd':
+            if self._config['algorithm'] == 'gd':
                 # We take the whole dataset for each iteration
                 indexes = np.arange(X.shape[0])
-            elif self.algorithm == 'sgd':
+            elif self._config['algorithm'] == 'sgd':
                 # We randomly take samples from the dataset
                 indexes = np.random.choice(X.shape[0], 10)
 
             # Compute gradient on whole dataset and update weights
             # according to the learning rate
-            self.beta = self.beta + (self.lr * self._gradient(X[indexes, :], self.beta, y[indexes]))
+            self.beta = self.beta + (
+                self._config['lr'] * self._gradient(X[indexes, :], self.beta, y[indexes])
+            )
             self.log_likelihood = self._log_likelihood(X, self.beta, y)
             self.accuracy = self._accuracy_score(self._model(X, self.beta) > .5, y)
 
@@ -155,7 +157,7 @@ class LogisticRegression:
             self.history[i, :] = (i, self.log_likelihood, self.accuracy)
 
             # If we reached sufficient precision, let's exit the loop
-            if np.sum(np.abs(beta - self.beta)) < self.threshold:
+            if np.sum(np.abs(beta - self.beta)) < self._config['threshold']:
                 print(f'Convergence reached in {i} iterations, exiting the loop ...')
                 break
 
