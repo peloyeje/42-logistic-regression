@@ -5,6 +5,7 @@ from .utils import OneHotEncoder
 
 class LogisticRegression:
     SUPPORTED_ALGORITHMS = ('gd', 'sgd')
+    SUPPORTED_MULTICLASS = ('ovr')
 
     def __init__(
         self, algorithm='gd', multiclass='ovr', lr=0.01,
@@ -32,8 +33,8 @@ class LogisticRegression:
         else:
             self.algorithm = algorithm
 
-        if multiclass not in ('ovr', None):
-            raise ValueError(f'Multiclass method "{algorithm}" not supported')
+        if multiclass not in self.SUPPORTED_MULTICLASS:
+            raise ValueError(f'Multiclass method "{multiclass}" not supported')
         else:
             self.multiclass = multiclass
 
