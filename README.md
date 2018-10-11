@@ -10,8 +10,22 @@ Make sure your Python version is **3.7**
 ### Components
 
 #### Visualisation
-- `src/describe.py`:
-- `src/histogram.py`:
+- `src/describe.py`: this script gives a complete description of each of your numerical features (mean, std, max, min, median, first and third quartiles).
+
+To run the script on the training Hogwarts dataset:
+
+```
+./src/describe.py data/dataset_train.csv
+```
+
+- `src/histogram.py`: this script finds the courses that have a similar distribution of grades for each of the Hogwarts houses. In order to do so, for each course, the script executes  Kolmogorov-Smirnov to test the similarity of distribution between two houses for all combination of houses. If all the p-values of these tests are above 5%, the course is said to have a homogeneous distribution and the program plots histograms of its distribution for each house.
+
+To run the script on the training Hogwarts dataset:
+
+```
+./src/histogram.py data/dataset_train.csv
+```
+
 - `src/pair_plot.py`:
 - `src/scatter_plot.py` : this script finds the two courses that have the closest distribution in each of the four Hogwarts houses and plots the corresponding distributions.
 
