@@ -33,8 +33,8 @@ if __name__ == '__main__':
     if not args.output.is_dir() or not args.output.exists():
         raise ValueError(f'{args.output} is not a valid directory')
 
+    # Load and preprocess the data
     try:
-        # Load and preprocess the data
         print(f"Opening {args.input.name} ...")
         data = pd.read_csv(args.input)
 
@@ -54,7 +54,6 @@ if __name__ == '__main__':
         y = data.loc[:, 'Hogwarts House'].values
     except Exception as e:
         print("Unable to open input dataset")
-        raise e
         sys.exit(1)
 
     # Train the logistic regression
@@ -83,5 +82,4 @@ if __name__ == '__main__':
                 pickle.dump(obj, f)
         except Exception as e:
             print(f'Unable to save {name}')
-            raise e
             sys.exit(1)
