@@ -1,7 +1,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
-from .utils import OneHotEncoder
+from utils import OneHotEncoder
 
 class LogisticRegression:
     SUPPORTED_ALGORITHMS = ('gd', 'sgd')
