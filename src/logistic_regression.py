@@ -137,8 +137,16 @@ class LogisticRegression:
             # We save n-1 beta for convergence test
             beta = self.beta
 
-            # Compute gradient and update weights according to learning rate
-            self.beta = self.beta + (self.lr * self._gradient(X, self.beta, y))
+            if self.algorithm == 'gd':
+                # We take the whole dataset for each iteration
+                indexes = np.arange(X.shape[0])
+            elif self.algorithm == 'sgd':
+                # We randomly take samples from the dataset
+                indexes = np.random.choice(X.shape[0], 10)
+
+            # Compute gradient on whole dataset and update weights
+            # according to the learning rate
+            self.beta = self.beta + (self.lr * self._gradient(X[indexes, :], self.beta, y[indexes]))
             self.log_likelihood = self._log_likelihood(X, self.beta, y)
             self.accuracy = self._accuracy_score(self._model(X, self.beta) > .5, y)
 
