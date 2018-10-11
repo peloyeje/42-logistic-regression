@@ -1,2 +1,3 @@
 import numpy as np
-from .describe import DataAnalysis
+from .train import LinearRegression
+from .predict import predict
