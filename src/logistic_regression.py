@@ -198,7 +198,7 @@ class LogisticRegression:
         return (np.array([self._encoder.categories[i] for i in res])
                     if names else res)
 
-    def plot_history(self):
+    def plot(self):
         """Plots a summary graph of the fitting process."""
         if not hasattr(self, 'history'):
             raise ValueError('Please train the model first')
