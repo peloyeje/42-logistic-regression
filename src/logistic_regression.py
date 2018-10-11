@@ -225,15 +225,30 @@ class LogisticRegression:
 
     def plot(self):
         """Plots a summary graph of the fitting process."""
+        if self.is_multiclass:
+            for name, model in zip(self._encoder.categories, self._models):
+                model._plot(f'Training statistics for class "{name}"')
+        else:
+            self._plot()
+
+    def _plot(self, title=None):
+        """Plots a summary graph of the fitting process."""
         if not hasattr(self, 'history'):
             raise ValueError('Please train the model first')
 
         labels = ['Train accurary', 'LL']
+        colors = ['r', 'g']
         fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(20, 10))
+        title = (f'Logistic regression on {len(self.beta) - 1} features'
+                    if not title else title)
 
-        for ax, data, label in zip(axes, self.history[self.history[:, 0] != 0, 1:].T, labels):
-            ax.plot(np.arange(data.size), data)
+        for ax, data, label, color in zip(axes,
+                                   self.history[self.history[:, 0] != 0, 1:].T,
+                                   labels,
+                                   colors):
+            ax.plot(np.arange(data.size), data, color=color)
             ax.legend([label])
             ax.set_xlabel('Iterations')
-        fig.suptitle(f'Logistic regression on {len(self.beta) - 1} features')
+
+        fig.suptitle(title)
         plt.show()
