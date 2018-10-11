@@ -66,4 +66,5 @@ class Histogram42(object):
         plt.show()
 
 if __name__ == "__main__":
-    Histogram42('../data/dataset_train.csv').plot_histogram()
+    path = sys.argv[1]
+    Histogram42(path).plot_histogram()

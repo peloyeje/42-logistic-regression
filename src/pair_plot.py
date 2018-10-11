@@ -44,4 +44,5 @@ class PairPlot(object):
         plt.show()
 
 if __name__ == "__main__":
-    PairPlot('../data/dataset_train.csv').plot_graph()
+    path = sys.argv[1]
+    PairPlot(path).plot_graph()

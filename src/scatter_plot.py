@@ -68,4 +68,5 @@ class ScatterPlot(object):
         plt.show()
 
 if __name__ == "__main__":
-    ScatterPlot('../data/dataset_train.csv').plot_histogram()
+    path = sys.argv[1]
+    ScatterPlot(path).plot_histogram()
