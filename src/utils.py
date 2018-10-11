@@ -11,7 +11,7 @@ class OneHotEncoder:
         self.categories = np.unique(X)
         return X
 
-    def transform(self, X):"
+    def transform(self, X):
         return np.array(
             [(X == k).astype('int') for k in self.categories]
         ).T

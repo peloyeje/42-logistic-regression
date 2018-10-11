@@ -21,11 +21,13 @@ Make sure your Python version is **3.7**
 To train the model:
 
 ```
+
 ```
 
 To make predictions:
 
 ```
+
 ```
 
 ### Authors
