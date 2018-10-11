@@ -121,7 +121,7 @@ class LogisticRegression:
                 for name, data in zip(self._encoder.categories, y.T):
                     print(f'Training model for class "{name}"')
 
-                    model = LogisticRegression()
+                    model = LogisticRegression(**self._config)
                     model._fit(X, data, **kwargs)
 
                     # Store trained model
